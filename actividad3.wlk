@@ -1,32 +1,36 @@
-// example.wlk
-// example.wlk
-// example.wlk
-// example.wlk
-// example.wlk
+// actividad3.wlk
+// actividad3.wlk
+// actividad3.wlk
+// actividad3.wlk
 
-// hacer #{} conjunto vacio 
+
+
+/*
+esRecomendadaPara a la clase Actividad y sobrescribirlo en las subclases ViajeDePlaya y ClaseDeGimnasia para implementar la lógica específica para cada tipo de actividad.
+*/
 class Actividad {
-  const idiomas = #{} 
-  //get de idiomas
-  method idiomas()=idiomas 
-  //el get, no es necesario le agregue el property
+  const idiomas = #{}
+  method idiomas()=idiomas
   method initialize() {
-    if(idiomas.isEmpty())  {self.error("debe ser una colección que tenga al menos un idioma en formato string")}
+    if(idiomas.isEmpty()) {self.error("debe ser una colección que tenga al menos un idioma en formato string")}
   }
   method esInteresante() = idiomas.size() > 1
-  method sirveParaBroncearse() = true //es true para todos a menos que cambie su condicion
-
+  method sirveParaBroncearse() = true
   method dias()
-  method implicaEsfuerzo() = true 
+  method implicaEsfuerzo() = true
 
+  //punto 6 
+  method esRecomendadaPara(unSocio) = false // Por defecto, una actividad no es recomendada
 }
 
 class ViajeDePlaya inherits Actividad {
   const largo
   override method dias() = largo / 500
   override method implicaEsfuerzo() = largo > 1200
-  //override method sirveParaBroncearse() = true
-  // ya la hereda y esta en true ademas 
+  
+  //punto 6
+  override method esRecomendadaPara(unSocio) = 
+    self.esInteresante() and unSocio.leAtrae(self) and not unSocio.yaRealizo(self)
 }
 
 class ExcursionACiudad inherits Actividad {
@@ -37,8 +41,6 @@ class ExcursionACiudad inherits Actividad {
   override method implicaEsfuerzo() = cantidadAtracciones.between(5, 8)
 }
 
-//subclase es falsa por defoult lucautMethod, hereda el de la clase
-//sobreescribe a la clase con super la sub
 class ExcursionTropical inherits ExcursionACiudad {
   override method dias() = super() + 1
   override method sirveParaBroncearse() = true
@@ -55,57 +57,45 @@ class SalidaDeTrekking inherits Actividad {
     diasDeSol > 200 ||
     (diasDeSol.between(100, 200) && kms > 120)
   }
-
 }
 
-//en la herencia nose pueden sobreescribir los atributos
-// var idiomas = #{"español"} -------> NO
 class ClaseDeGimnasia inherits Actividad {
-  //mas optima, forzamos una validacion
   method initialize() {
-    //probar el override method 
     idiomas.clear()
     idiomas.add("español")
   }
-  //solo si lo solicita , es una variante y hay que llamarlo
-  //deja al constructor fuera de juego
-  //method validador() {
-    //if(!idiomas==#{"español"}) {
-      //self.error("el unico idioma disponible es español")
-    //}
-  //}
-  override method idiomas() = #{"español"} //es redundante porque se valida en la creación, pero está muy bien.
+  override method idiomas() = #{"español"}
   override method dias() = 1
-  // implica Esfuerzo esta true en actividad
   override method sirveParaBroncearse() = false
+
+  //punto 6 sobreescribi los metodos
+  override method esRecomendadaPara(unSocio) = unSocio.edad().between(20, 30)
 }
 
-
-//Socio
-class Socio { 
+class Socio {
   const property actividades = []
   const maximoActividades
   var edad
-  const idiomas = #{} //conjunto de idiomas que habla el socio
+  const idiomas = #{}
 
   method edad()=edad
   
   method initialize() {
-    actividades.clear() //limpia la lista de actividades
+    actividades.clear()
   }
   
-
-  //Actividad para registrar
   method registrarActividad(unaActividad) {
     if(maximoActividades==actividades.size()) {
       self.error("el socio alcanzó el máximo de actividades")
     }
     actividades.add(unaActividad)
   }
-  //todos cumplen esa condicion all es un mesnaje mas
   method esAdoradorDelSol() = actividades.all({a=>a.sirveParaBroncearse()})
   method actividadesEsforzadas() = actividades.filter({a=>a.implicaEsfuerzo()})
-  method leAtrae(unaActividad) //metodo abstracto y lo desarrollo dentro de cada subclase
+  method leAtrae(unaActividad)
+
+  //punto 6 sobreescribi los metodos
+  method yaRealizo(unaActividad) = actividades.contains(unaActividad)
 }
 
 class SocioTranquilo inherits Socio {
@@ -115,17 +105,15 @@ class SocioTranquilo inherits Socio {
 class SocioCoherente inherits Socio {
   override method leAtrae(unaActividad) {
     return
-    if(self.esAdoradorDelSol()) {unaActividad.sirveParaBroncearse()} 
+    if(self.esAdoradorDelSol()) {unaActividad.sirveParaBroncearse()}
     else {unaActividad.implicaEsfuerzo()}
   }
 }
 
-//interseccion del conjunto
 class SocioRelajado inherits Socio {
   override method leAtrae(unaActividad) {
     return
     not idiomas.intersection(
       unaActividad.idiomas()).isEmpty()
-  }//si no me da vacio la interceccion entre idiomas le atrae
-  //NOT
+  }
 }

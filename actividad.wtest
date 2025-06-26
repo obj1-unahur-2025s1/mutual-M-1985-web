@@ -1,46 +1,19 @@
-// testExample.wtest
-// testExample.wtest
-// testExample.wtest
-import example.*
+// actividad.wtest
+import actividad.*
 
-/*
-P.ej. 
-* una salida de 100 kilómetros a un lugar con 130 días de sol 
-por año: lleva 2 días, implica esfuerzo, y no sirve para 
-broncearse. 
-* una salida de 50 kilómetros a un lugar con 240 días de sol 
-por año: lleva 1 día, no implica esfuerzo, y sí sirve para 
-broncearse.
-* una salida de 250 kilómetros a un lugar con 130 días de sol 
-por año: lleva 5 días, implica esfuerzo, y sirve para 
-broncearse. 
-*/
-
-// const trek1 = new SalidaDeTrekking() recien ahi se crea el objeto de la clase
-
-/*
-roque.esAdoradorDelSol() devuelve true.
-roque.actividadesEsforzadas() devuelve una colección que tiene solamente el viaje de 2000 metros de playa.
-si registramos que Roque realiza una clase de gimnasia, se debe generar un error
-*/
 describe "group of tests for mutual" {
 
   const trek1 = new SalidaDeTrekking(kms=100,diasDeSol=130,idiomas=#{"ingles"})
   const trek2 = new SalidaDeTrekking(kms=50,diasDeSol=240,idiomas=#{"ingles"})
   const trek3 = new SalidaDeTrekking(kms=250,diasDeSol=130,idiomas=#{"ingles"})
 
-
   const playa1 = new ViajeDePlaya(largo=1000,idiomas=#{"jeringozo"})
   const playa2 = new ViajeDePlaya(largo=2000,idiomas=#{"esperanto"})
 
-
   const gim1 = new ClaseDeGimnasia()
-
 
   const roque = new SocioTranquilo(maximoActividades=2,edad=40,idiomas=#{"español"})
 
-  //si necesitaramos hacer cambios es necesario Roque
-  //le cargamso los dos dias de playa a roque 
   method initialize() {
     roque.registrarActividad(playa1)
     roque.registrarActividad(playa2)
@@ -64,19 +37,11 @@ describe "group of tests for mutual" {
     assert.that(roque.esAdoradorDelSol())
   }
 
-  //devuelve una coleccion 
-  // [] retorn una lista 
   test "las activides esforzadas es solo el viaje de 2000 metros" {
     assert.equals([playa2],roque.actividadesEsforzadas())
   }
 
-  //no puede throwsExceptionWithMessage
-  //asi se testean los errores
-  //documentcion de wollok
   test "roque no puede hacer gim porque ya hizo sus 2 actividad máximas" {
       assert.throwsExceptionWithMessage("el socio alcanzó el máximo de actividades",{roque.registrarActividad(gim1)})
   }
-
-
 }
-

@@ -1,0 +1,140 @@
+// actividad4.wtest
+// actividad4.wtest
+// actividad4.wtest
+// actividad4.wtest
+// actividad4.wtest
+import actividad4.*
+
+describe "group of tests for mutual" {
+
+  const trek1 = new SalidaDeTrekking(kms=100,diasDeSol=130,idiomas=#{"ingles"})
+  const trek2 = new SalidaDeTrekking(kms=50,diasDeSol=240,idiomas=#{"ingles"})
+  const trek3 = new SalidaDeTrekking(kms=250,diasDeSol=130,idiomas=#{"ingles"})
+
+  const playa1 = new ViajeDePlaya(largo=1000,idiomas=#{"jeringozo"})
+  const playa2 = new ViajeDePlaya(largo=2000,idiomas=#{"esperanto"})
+  const playaInteresanteNoRealizada = new ViajeDePlaya(largo=500, idiomas=#{"ingles", "frances"})
+  const playaNoAtractiva = new ViajeDePlaya(largo=50, idiomas=#{"chino"})
+
+  const gim1 = new ClaseDeGimnasia()
+  const gimParaJoven = new ClaseDeGimnasia()
+
+  // Libros para talleres
+  const libroCortoIngles = new Libro(idioma="ingles", paginas=150, autor="Jane Austen")
+  const libroLargoEspanol = new Libro(idioma="español", paginas=600, autor="Gabriel García Márquez")
+  const libroOtroAutor = new Libro(idioma="frances", paginas=200, autor="Victor Hugo")
+  const libroMismoAutor2 = new Libro(idioma="ingles", paginas=300, autor="Jane Austen")
+
+  // Talleres Literarios
+  const tallerSimple = new TallerLiterario(libros=#{libroCortoIngles})
+  const tallerEsforzadoPorPaginas = new TallerLiterario(libros=#{libroCortoIngles, libroLargoEspanol})
+  const tallerEsforzadoPorAutor = new TallerLiterario(libros=#{libroCortoIngles, libroMismoAutor2})
+  const tallerSinEsfuerzo = new TallerLiterario(libros=#{libroCortoIngles, libroOtroAutor})
+
+
+  const roque = new SocioTranquilo(maximoActividades=2,edad=40,idiomas=#{"español"})
+  const ana = new SocioTranquilo(maximoActividades=5, edad=25, idiomas=#{"ingles", "frances"}) // Ana habla dos idiomas
+  const pedro = new SocioCoherente(maximoActividades=3, edad=35, idiomas=#{"frances"})
+  const lucia = new SocioRelajado(maximoActividades=4, edad=30, idiomas=#{"español"}) // Lucia solo habla un idioma
+
+  method initialize() {
+    roque.registrarActividad(playa1)
+    roque.registrarActividad(playa2)
+    ana.registrarActividad(trek1) 
+  }
+
+  test "trek1 lleva 2 días" {
+    assert.equals(2, trek1.dias())
+  }
+  test "trek2 lleva 1 días" {
+    assert.equals(1, trek2.dias())
+  }
+  test "trek3 lleva 5 días" {
+    assert.equals(5, trek3.dias())
+  }
+
+  test "trek1 implica esfuerzo" {
+    assert.that(trek1.implicaEsfuerzo())
+  }
+
+  test "roque es adorador del sol" {
+    assert.that(roque.esAdoradorDelSol())
+  }
+
+  test "las activides esforzadas es solo el viaje de 2000 metros" {
+    assert.equals([playa2],roque.actividadesEsforzadas())
+  }
+
+  test "roque no puede hacer gim porque ya hizo sus 2 actividad máximas" {
+      assert.throwsExceptionWithMessage("el socio alcanzó el máximo de actividades",{roque.registrarActividad(gim1)})
+  }
+  
+  // --- Tests para Recomendación de Actividades existentes ---
+
+  test "playa interesante no realizada es recomendada para Ana" {
+    assert.that(playaInteresanteNoRealizada.esRecomendadaPara(ana))
+  }
+
+  test "playa que ya realizó Ana no es recomendada" {
+    assert.notThat(trek1.esRecomendadaPara(ana))
+  }
+
+  test "playa que no le atrae a Pedro no es recomendada" {
+    assert.notThat(playaNoAtractiva.esRecomendadaPara(pedro))
+  }
+  
+  test "clase de gimnasia es recomendada para Ana (25 años)" {
+    assert.that(gimParaJoven.esRecomendadaPara(ana))
+  }
+
+  test "clase de gimnasia no es recomendada para Roque (40 años)" {
+    assert.notThat(gim1.esRecomendadaPara(roque))
+  }
+
+  test "clase de gimnasia no es recomendada para Pedro (35 años)" {
+    assert.notThat(gim1.esRecomendadaPara(pedro))
+  }
+
+  // --- Nuevos Tests para Taller Literario ---
+
+  test "idiomas de taller simple son los del libro" {
+    assert.equals(#{"ingles"}, tallerSimple.idiomas())
+  }
+
+  test "idiomas de taller esforzado por paginas son de ambos libros" {
+    assert.equals(#{"ingles", "español"}, tallerEsforzadoPorPaginas.idiomas())
+  }
+
+  test "taller simple lleva 2 días (1 libro + 1)" {
+    assert.equals(2, tallerSimple.dias())
+  }
+
+    //no funciono
+  test "taller esforzado por paginas lleva 3 días (2 libros + 1)" {
+    assert.equals(3, tallerEsforzadoPorPaginas.dias())
+  }
+
+  test "taller con libro de +500 paginas implica esfuerzo" {
+    assert.that(tallerEsforzadoPorPaginas.implicaEsfuerzo())
+  }
+//no funciono
+  test "taller con varios libros del mismo autor implica esfuerzo" {
+    assert.that(tallerEsforzadoPorAutor.implicaEsfuerzo())
+  }
+  //no funciono
+  test "taller sin esfuerzo no implica esfuerzo" {
+    assert.notThat(tallerSinEsfuerzo.implicaEsfuerzo())
+  }
+
+  test "taller literario nunca sirve para broncearse" {
+    assert.notThat(tallerSimple.sirveParaBroncearse())
+  }
+    //no funciono
+  test "taller literario es recomendado para Ana (habla más de un idioma)" {
+    assert.that(tallerSimple.esRecomendadaPara(ana))
+  }
+//no funciono
+  test "taller literario no es recomendado para Lucia (habla solo un idioma)" {
+    assert.notThat(tallerSimple.esRecomendadaPara(lucia))
+  }
+}
